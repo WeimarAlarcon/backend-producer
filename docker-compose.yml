@@ -1,0 +1,33 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest  # Imagen oficial de Zookeeper de Confluent
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - kafka-net
+
+  kafka:
+    image: confluentinc/cp-kafka:latest  # Imagen oficial de Kafka de Confluent
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1  # ID del broker en caso de que tengas múltiples brokers
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181  # Conexión a Zookeeper
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092  # Listener para conexiones externas
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT  # Protocolo de seguridad, en este caso PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1  # Factor de replicación para el topic de offsets
+      KAFKA_LOG_RETENTION_HOURS: 168  # Mantener logs por 7 días (puedes ajustar este valor)
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'  # Crear tópicos automáticamente si no existen
+    networks:
+      - kafka-net
+
+networks:
+  kafka-net:
+    driver: bridge
