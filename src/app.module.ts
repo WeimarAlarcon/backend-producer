@@ -17,12 +17,20 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         transport: Transport.KAFKA,
         options: {
           client: {
-            // clientId: 'producer-client-id',
+            clientId: 'producer-client-id',
             brokers: ['localhost:9092'],
+            connectionTimeout: 30000,  // 30 segundos de espera para la conexión
+            // authenticationTimeout: 1000,  // Tiempo de espera para la autenticación (1 segundo)
+            // reauthenticationThreshold: 10000,  // Tiempo para volver a autenticarse (10 segundos)
+            retry: {
+              retries: 10,  // Número de reintentos
+              initialRetryTime: 300,  // Tiempo de espera inicial para reintentos (ms)
+            },
           },
           consumer: {
             groupId: 'producer-group',  // GroupId único para backend 1
           },
+
         },
       },
     ]),

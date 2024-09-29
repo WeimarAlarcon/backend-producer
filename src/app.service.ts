@@ -15,7 +15,7 @@ export class AppService {
 
   async sendMessage(message: any) {
     console.log('Sending: ', message);
-    return this.kafkaClient.send('product.created', message); // Envía el mensaje al tópico "product.created"
+    return this.kafkaClient.emit('product.created', message); // Envía el mensaje al tópico "product.created"
   }
   getHello(): string {
     return 'Hello World!';

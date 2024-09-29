@@ -35,7 +35,10 @@ $ npm install
 ## Docker
 
 ```bash
+$ docker-compose down
 $ docker-compose up -d
+levantar servicios:
+$ docker-compose up
 ```
 
 ## Compile and run the project
