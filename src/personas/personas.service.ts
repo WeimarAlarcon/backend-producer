@@ -101,7 +101,7 @@ export class PersonasService {
   }
 
   async personaPost(createPersonaDto: CreatePersonaDto): Promise<any> {
-    const mensaje = await this.kafkaClient.send('persona.enviada', createPersonaDto);
+    const mensaje = await this.kafkaClient.emit('persona.enviada', createPersonaDto);
     return mensaje;
   }
 }
