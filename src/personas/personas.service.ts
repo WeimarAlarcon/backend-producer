@@ -1,17 +1,27 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePersonaDto } from './dto/create-persona.dto';
 import { UpdatePersonaDto } from './dto/update-persona.dto';
 import { Repository } from 'typeorm';
 import { Persona } from './entities/persona.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ClientKafka } from '@nestjs/microservices';
 
 @Injectable()
 export class PersonasService {
 
   constructor(
+    @Inject('KAFKA_SERVICE') 
+    private readonly kafkaClient: ClientKafka,
+
     @InjectRepository(Persona)
     private personaRepository: Repository<Persona>,
   ) {}
+
+  async onModuleInit() {
+    this.kafkaClient.subscribeToResponseOf('persona.enviada');
+    await this.kafkaClient.connect();
+  }
+
   async create(createPersonaDto: CreatePersonaDto) {
     const ciExiste = await this.personaRepository.findOne({
       where: {
@@ -88,5 +98,10 @@ export class PersonasService {
     } catch (error) {
       throw new BadRequestException('Error al eliminar persona');
     }
+  }
+
+  async personaPost(createPersonaDto: CreatePersonaDto): Promise<any> {
+    const mensaje = await this.kafkaClient.send('persona.enviada', createPersonaDto);
+    return mensaje;
   }
 }

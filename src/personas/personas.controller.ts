@@ -31,4 +31,10 @@ export class PersonasController {
   async remove(@Param('id') id: string) {
     return await this.personasService.remove(+id);
   }
+
+  @Post('enviar-persona')
+  async personaPost(@Body() createPersonaDto: CreatePersonaDto): Promise<any> {
+    const result = await this.personasService.personaPost(createPersonaDto);
+    return result;
+  }
 }
